@@ -29,8 +29,18 @@ extension RMCharacterListViewViewModel: UICollectionViewDelegate, UICollectionVi
     
     //function wchich takes an object to add to grid
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
-        cell.backgroundColor = .green
+        
+        
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: RMCharackterListCellView.cellIdentifier,
+            for: indexPath) as? RMCharackterListCellView else {
+            return UICollectionViewCell()
+        }
+                
+        let cellViewModel = RMCharacterListtCellViewModel(name: "begenc",
+                                                         status: .alive,
+                                                          img: URL(string: "https://rickandmortyapi.com/api/character/avatar/20.jpeg"))
+        cell.Configure(with: cellViewModel)
         return cell
     }
     

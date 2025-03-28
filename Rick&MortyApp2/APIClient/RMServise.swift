@@ -44,7 +44,7 @@ final class RMServise{
             
             do{
                 let json = try JSONSerialization.jsonObject(with: data)
-                print(String(describing: json))
+                //print(String(describing: json))
             }catch{
                 completition(.failure(error))
             }

@@ -11,6 +11,7 @@ class RMCharackterListView: UIView {
 
     private let characterViewModel = RMCharacterListViewViewModel()
     
+    
     //ui spinner whic will work at start
     private let spiner:UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView(style: .large)
@@ -31,7 +32,8 @@ class RMCharackterListView: UIView {
         collectionView.isHidden=true
        
         //givind a identificator for cells in thic grid
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        collectionView.register(RMCharackterListCellView.self,
+                                forCellWithReuseIdentifier: RMCharackterListCellView.cellIdentifier)
         return collectionView
     }()
     
