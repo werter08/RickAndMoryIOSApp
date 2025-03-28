@@ -19,7 +19,10 @@ final class RMServise{
     /// - Parameters:
     ///   - request: call data
     ///   - completition: our get from API
-    public func Execute(_ request:RMRequest, completition: @escaping () -> Void){
+    public func Execute<T:Codable>(
+        _ request:RMRequest,
+        expecting type:T.Type,
+        completition: @escaping (Result<T,Error>) -> Void){
         
     }
 }
