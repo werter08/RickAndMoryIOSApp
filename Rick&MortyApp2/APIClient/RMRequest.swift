@@ -16,7 +16,7 @@ final class RMRequest{
     //Queryparametr
     private struct Constants {static let baseUrl = "https://rickandmortyapi.com/api"}
     private let endPoint: RMEndPoint
-    private var pathComponent: Set<String>
+    private var pathComponent: [String]
     private let queryParameter: [URLQueryItem]
     
     private var urlString:String {
@@ -26,13 +26,13 @@ final class RMRequest{
         
         if !pathComponent.isEmpty{
             if(pathComponent.count>1){
-                str+="/\(pathComponent.first!)"
-                pathComponent.remove(pathComponent.first!)
+                str+="/\(pathComponent[0])"
+                pathComponent.remove(at:0)
                 pathComponent.forEach({
                     str+=",\($0)"
                 })
             }else{
-                str+="/\(pathComponent.first!)"
+                str+="/\(pathComponent[0])"
             }
             
         }
@@ -57,7 +57,7 @@ final class RMRequest{
     public let HTTPMethod = "GET"
     
     
-    public init(endPoint:RMEndPoint, pathComponent: Set<String> = [], queryParametr:[URLQueryItem] = []){
+    public init(endPoint:RMEndPoint, pathComponent: [String] = [], queryParametr:[URLQueryItem] = []){
         self.pathComponent = pathComponent
         self.endPoint=endPoint
         self.queryParameter = queryParametr
