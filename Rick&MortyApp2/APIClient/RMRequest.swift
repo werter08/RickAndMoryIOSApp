@@ -18,6 +18,8 @@ final class RMRequest{
     private let endPoint: RMEndPoint
     private var pathComponent: [String]
     private let queryParameter: [URLQueryItem]
+    private var fullUrl:String = ""
+    private var hasURl:Bool = false
     
     private var urlString:String {
         var str:String = Constants.baseUrl
@@ -51,13 +53,28 @@ final class RMRequest{
     }
    
     public var url:URL? {
-        return URL(string: urlString)
+        if hasURl{
+            return URL(string: fullUrl)
+        }else{
+            return URL(string: urlString)
+        }
     }
     
     public let HTTPMethod = "GET"
     
     
     public init(endPoint:RMEndPoint, pathComponent: [String] = [], queryParametr:[URLQueryItem] = []){
+        self.pathComponent = pathComponent
+        self.endPoint=endPoint
+        self.queryParameter = queryParametr
+        self.hasURl=false
+    }
+    public init?(url:String,
+                endPoint:RMEndPoint = RMEndPoint.character,
+                pathComponent: [String] = [],
+                queryParametr:[URLQueryItem] = []){
+        self.fullUrl = url
+        self.hasURl=true
         self.pathComponent = pathComponent
         self.endPoint=endPoint
         self.queryParameter = queryParametr

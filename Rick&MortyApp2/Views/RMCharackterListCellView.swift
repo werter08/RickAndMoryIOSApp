@@ -8,6 +8,8 @@
 import UIKit
 
 class RMCharackterListCellView: UICollectionViewCell {
+
+    
     
     public static let cellIdentifier = "RMCharacterCollectionViewCell"
     
@@ -40,10 +42,19 @@ class RMCharackterListCellView: UICollectionViewCell {
         super.init(frame: frame)
         contentView.backgroundColor = .secondarySystemBackground
         SetUpViews()
-       
+        SetUpLayer()
+        
     }
     required init?(coder: NSCoder) {
         fatalError("Unspeckted")
+    }
+    
+    func SetUpLayer(){
+        contentView.layer.cornerRadius=10
+        contentView.layer.shadowColor=UIColor.label.cgColor
+        contentView.layer.shadowOpacity=0.3
+        contentView.layer.shadowOffset = CGSize(width: 0, height: 2)
+        contentView.layer.shadowRadius=5
     }
     
     func SetUpViews(){
@@ -68,9 +79,13 @@ class RMCharackterListCellView: UICollectionViewCell {
 
 
         ])
-        
-        
     }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        SetUpLayer()
+    }
+    
     public func Configure(with module: RMCharacterListtCellViewModel){
         nameLabel.text = module.name
         statusLabel.text = module.StatusText()

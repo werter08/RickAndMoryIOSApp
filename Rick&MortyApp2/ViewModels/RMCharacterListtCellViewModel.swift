@@ -1,7 +1,9 @@
 
 import UIKit
 
-class RMCharacterListtCellViewModel{
+
+
+class RMCharacterListtCellViewModel: Hashable{
     public let name:String
     private let status:RMCharacterStatus
     public let imgURL: URL?
@@ -12,9 +14,15 @@ class RMCharacterListtCellViewModel{
         self.imgURL = img
     }
     
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+        hasher.combine(status)
+        hasher.combine(imgURL)
+    }
+    
     //convert enum case to string
     public func StatusText() -> String{
-        self.status.rawValue
+        "Status: \(self.status.rawValue)"
     }
     
     
@@ -24,19 +32,14 @@ class RMCharacterListtCellViewModel{
             completion(.failure(URLError(.badURL)))
             return
         }
-        let urlRequest = URLRequest(url: url)
-        
-        let task = URLSession.shared.dataTask(with: urlRequest){data,_,error in
-            guard let data, error==nil else{
-                completion(.failure(URLError(.cannotDecodeContentData)))
-                return
-            }
-            
-            completion(.success(data))
-        }
-        task.resume()
+        RMImageManager.shared.DownloadImage(url: url, completion: completion)
         
         
         
+    }
+}
+extension RMCharacterListtCellViewModel:Equatable{
+    static func ==(lhs: RMCharacterListtCellViewModel, rhs: RMCharacterListtCellViewModel) -> Bool {
+        return lhs.hashValue == rhs.hashValue
     }
 }

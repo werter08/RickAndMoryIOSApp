@@ -43,8 +43,9 @@ final class RMServise{
             
             
             do{
-                let json = try JSONSerialization.jsonObject(with: data)
-                //print(String(describing: json))
+                let result = try JSONDecoder().decode(type.self, from: data)
+                completition(.success(result))
+                //print(result)
             }catch{
                 completition(.failure(error))
             }
@@ -59,6 +60,7 @@ final class RMServise{
             return nil
         }
         //print(url)
+        
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = rmRequest.HTTPMethod
         return urlRequest

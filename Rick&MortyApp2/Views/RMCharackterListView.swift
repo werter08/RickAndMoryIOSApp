@@ -7,10 +7,15 @@
 
 import UIKit
 
+protocol RMCharackterListViewDelegate: AnyObject{
+    func CharTapped(_ charListView: RMCharackterListView,
+        character:RMCharacter)
+}
+
 class RMCharackterListView: UIView {
 
     private let characterViewModel = RMCharacterListViewViewModel()
-    
+    public weak var delegate:RMCharackterListViewDelegate?
     
     //ui spinner whic will work at start
     private let spiner:UIActivityIndicatorView = {
@@ -24,16 +29,22 @@ class RMCharackterListView: UIView {
     private let collectionView:UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         //adding padding
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 10, bottom: 10, right: 10)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints=false;
         collectionView.alpha=0
         collectionView.isHidden=true
+ 
        
         //givind a identificator for cells in thic grid
         collectionView.register(RMCharackterListCellView.self,
                                 forCellWithReuseIdentifier: RMCharackterListCellView.cellIdentifier)
+        
+        collectionView.register(RMCharacterListViewCollectionReusableView.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+                                withReuseIdentifier: RMCharacterListViewCollectionReusableView.identifier)
+        
         return collectionView
     }()
     
@@ -48,9 +59,9 @@ class RMCharackterListView: UIView {
         addSubs(collectionView, spiner)
         SetNSConstrain()
         spiner.startAnimating()
-        characterViewModel.FetchCharacters()
         SetUpCollectionView()
-        
+        characterViewModel.delegate = self
+        characterViewModel.FetchCharacters()
     }
 
     required init?(coder: NSCoder) {
@@ -77,13 +88,32 @@ class RMCharackterListView: UIView {
     private func SetUpCollectionView(){
         collectionView.dataSource = characterViewModel
         collectionView.delegate = characterViewModel
-        //making a timer in the end want to show a grid
-        DispatchQueue.main.asyncAfter(deadline: .now()+2, execute: {
-            self.spiner.stopAnimating()
-            UIView.animate(withDuration: 1){
-                self.collectionView.isHidden=false
-                self.collectionView.alpha=1
-            }
-        })
+        
     }
+}
+
+extension RMCharackterListView: RMCharacterListtCellViewModelDelegate{
+   
+    
+    func NewCharsDidLoad(with indexPath: [IndexPath]) {
+        print(indexPath.count)
+        collectionView.performBatchUpdates {
+            self.collectionView.insertItems(at: indexPath)
+        }
+        
+    }
+    
+    func charTapped(character: RMCharacter) {
+        delegate?.CharTapped(self, character: character)
+    }
+    
+    func DidLoad() {
+        collectionView.reloadData()
+        self.spiner.stopAnimating()
+        self.collectionView.isHidden=false
+        UIView.animate(withDuration: 1){
+            self.collectionView.alpha=1
+        }
+    }
+    
 }
