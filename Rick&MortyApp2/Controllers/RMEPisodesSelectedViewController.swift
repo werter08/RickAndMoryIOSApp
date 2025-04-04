@@ -1,45 +1,48 @@
 //
-//  RMCharacterSelectedViewViewController.swift
+//  RMEPisodesSelectedViewController.swift
 //  Rick&MortyApp2
 //
-//  Created by Shirin-Yan on 29.03.2025.
+//  Created by Shirin-Yan on 02.04.2025.
 //
 
 import UIKit
 
-class RMCharacterSelectedViewViewController: UIViewController {
+class RMEpisodesSelectedViewController: UIViewController, RMEpisodeViewCellViewModelDelegate {
 
-    let collection: RMCharacterSelectedView
-    let viewModel: RMCharacterSelectedViewViewModel
-     
-    init(viewModel:RMCharacterSelectedViewViewModel){
-        self.viewModel = viewModel
-        self.collection = RMCharacterSelectedView(frame: .zero, viewModel: self.viewModel)
+
+    public let viewModel: RMEpisodeSelectedViewViewModel
+    private let collection: RMEpisodeSelectedView
+    
+    init(url: URL?) {
+        self.viewModel = RMEpisodeSelectedViewViewModel(url: url)
+        collection = RMEpisodeSelectedView(frame: .zero, viewModel: self.viewModel)
         super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-        title = viewModel.title
-        collection.collectionView?.delegate = self
-        collection.collectionView?.dataSource = self
+        title = "Episode"
+        view.backgroundColor = .secondarySystemBackground
+        viewModel.fetchDate()
+        viewModel.delegate = self
+
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action,
                                                             target: self,
                                                             action: #selector(didTapShare))
         
-        
-        SetLayout()
+        setUpConstraints()
+    
     }
     @objc func didTapShare(){
         
     }
     
-    private func SetLayout(){
+    
+    private func setUpConstraints(){
         view.addSubview(collection)
         
         NSLayoutConstraint.activate([
@@ -49,11 +52,21 @@ class RMCharacterSelectedViewViewController: UIViewController {
             collection.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
-
-
+    
+    
+    
+    func didFetchDate() {
+        collection.Configure(viewModel:  viewModel)
+        
+        collection.collectionView?.delegate = self
+        collection.collectionView?.dataSource = self
+    }
+    
 }
 
-extension RMCharacterSelectedViewViewController: UICollectionViewDelegate, UICollectionViewDataSource{
+
+
+extension RMEpisodesSelectedViewController: UICollectionViewDelegate, UICollectionViewDataSource{
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return viewModel.sections.count
@@ -62,11 +75,10 @@ extension RMCharacterSelectedViewViewController: UICollectionViewDelegate, UICol
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sectionTypes = viewModel.sections[section]
         switch sectionTypes{
-        case .imageScetion:
-            return 1
+       
         case .infoSection(let viewmodels):
             return viewmodels.count
-        case .seriesSection(let viewmodels):
+        case .chars(let viewmodels):
             return viewmodels.count
         }
         
@@ -75,33 +87,24 @@ extension RMCharacterSelectedViewViewController: UICollectionViewDelegate, UICol
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let sectionTypes = viewModel.sections[indexPath.section]
         switch sectionTypes{
-        case .imageScetion(let viewmodels):
-            guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: RMCharacterImageViewCell.Identifier,
-                for: indexPath) as? RMCharacterImageViewCell else {
-                fatalError()
-            }
-            cell.Configure(viewMOdel: viewmodels)
-            
-            return cell
-            
         case .infoSection(let viewmodels):
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: RMCharacterInfoViewCell.Identifier,
-                for: indexPath) as? RMCharacterInfoViewCell else {
+                withReuseIdentifier: RMEpisodeInfoViewCell.Identifier,
+                for: indexPath) as? RMEpisodeInfoViewCell else {
                 fatalError()
             }
-            cell.Configure(viewMOdel: viewmodels[indexPath.row])
             
+            cell.Configure(viewMOdel: viewmodels[indexPath.row])
+
             return cell
             
-        case .seriesSection(let viewmodels):
+        case .chars(let viewmodels):
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: RMEpisodeListCellView.Identifier,
-                for: indexPath) as? RMEpisodeListCellView else {
+                withReuseIdentifier: RMCharackterListCellView.cellIdentifier,
+                for: indexPath) as? RMCharackterListCellView else {
                 fatalError()
             }
-            cell.Configure(viewMOdel: viewmodels[indexPath.row])
+            cell.Configure(with: viewmodels[indexPath.row])
             
             return cell
         }
@@ -110,13 +113,12 @@ extension RMCharacterSelectedViewViewController: UICollectionViewDelegate, UICol
         let sectionTypes = viewModel.sections[indexPath.section]
         
         switch sectionTypes{
-        case .imageScetion, .infoSection:
+        case  .infoSection:
             return
-        case .seriesSection:
+        case .chars(_):
+            let charModel = viewModel.getCharModel(index: indexPath.row)
             
-            let episodes = viewModel.episodes
-            let url = episodes[indexPath.row]
-            let vc = RMEpisodesSelectedViewController(url: URL(string: url))
+            let vc = RMCharacterSelectedViewViewController(viewModel:  RMCharacterSelectedViewViewModel(char: charModel!))
             
             self.navigationController?.pushViewController(vc, animated: true)
             

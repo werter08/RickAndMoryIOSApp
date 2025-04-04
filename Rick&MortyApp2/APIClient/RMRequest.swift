@@ -15,7 +15,7 @@ final class RMRequest{
     //optionalPath
     //Queryparametr
     private struct Constants {static let baseUrl = "https://rickandmortyapi.com/api"}
-    private let endPoint: RMEndPoint
+    public let endPoint: RMEndPoint
     private var pathComponent: [String]
     private let queryParameter: [URLQueryItem]
     private var fullUrl:String = ""
@@ -74,7 +74,7 @@ final class RMRequest{
                 pathComponent: [String] = [],
                 queryParametr:[URLQueryItem] = []){
         self.fullUrl = url
-        self.hasURl=true
+        self.hasURl = true
         self.pathComponent = pathComponent
         self.endPoint=endPoint
         self.queryParameter = queryParametr

@@ -12,6 +12,7 @@ final class RMServise{
     /// shared singleton
     static let shared = RMServise()
     
+    private let casheManager = RMAPICasheManager()
     private init() {}
     
     private enum APIServiceErrors: Error {
@@ -32,7 +33,15 @@ final class RMServise{
             completition(.failure(APIServiceErrors.cantGetURL))
             return
         }
-        
+        if let data = casheManager.GetFromCashe(endpoint: request.endPoint, url: request.url) {
+            
+            do{
+                let result = try JSONDecoder().decode(type.self, from: data)
+                completition(.success(result))
+            }catch{
+                completition(.failure(error))
+            }
+        }
         
         let task = URLSession.shared.dataTask(with: urlRequest) { data, _, error in
             guard let data = data, error == nil else {
@@ -45,7 +54,7 @@ final class RMServise{
             do{
                 let result = try JSONDecoder().decode(type.self, from: data)
                 completition(.success(result))
-                //print(result)
+                self.casheManager.SetCashe(endPoint: request.endPoint, url: request.url, data: data)
             }catch{
                 completition(.failure(error))
             }
@@ -66,8 +75,9 @@ final class RMServise{
         return urlRequest
     }
     
-    public struct ListCharacterRequests{
+    public struct ListRequests{
         static let charachtersRequest = RMRequest.init(endPoint: .character)
+        static let episodesRequest = RMRequest.init(endPoint: .episode)
     }
 }
 

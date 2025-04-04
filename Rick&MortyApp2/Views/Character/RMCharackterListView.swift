@@ -108,12 +108,18 @@ extension RMCharackterListView: RMCharacterListtCellViewModelDelegate{
     }
     
     func DidLoad() {
-        collectionView.reloadData()
-        self.spiner.stopAnimating()
-        self.collectionView.isHidden=false
-        UIView.animate(withDuration: 1){
-            self.collectionView.alpha=1
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+            self.spiner.stopAnimating()
+            self.collectionView.isHidden=false
+            UIView.animate(withDuration: 1){
+                self.collectionView.alpha=1
+            }
+            
         }
+        
+        
+        
     }
     
 }

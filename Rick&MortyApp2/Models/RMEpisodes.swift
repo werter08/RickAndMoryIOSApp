@@ -5,7 +5,9 @@
 //  Created by Shirin-Yan on 28.03.2025.
 //
 
-struct RMEpisode : Codable {
+struct RMEpisode : Codable, RMEpisodeInChar {
+
+    
     let id: Int
     let name: String
     let air_date: String

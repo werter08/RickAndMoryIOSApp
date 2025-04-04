@@ -1,26 +1,25 @@
 import Foundation
 import UIKit
 
-protocol RMCharacterListtCellViewModelDelegate : AnyObject{
+protocol RMEpisodeListtCellViewModelDelegate : AnyObject {
     func DidLoad()
-    func NewCharsDidLoad(with indexPath:[IndexPath])
-    func charTapped(character:RMCharacter)
+    func NewepisodesDidLoad(with indexPath:[IndexPath])
+    func episodeTapped(episode:RMEpisode)
 }
-class RMCharacterListViewViewModel: NSObject{
+
+class RMEpisodeListViewViewModel: NSObject {
     
-    public var isLoadingCharacters:Bool = false
+    public var isLoadingepisodeacters:Bool = false
     
-    public weak var delegate:RMCharacterListtCellViewModelDelegate?
-    var CharData:[RMCharacter] = [] {
-        didSet{
-            for char in CharData{
-                let module = RMCharacterListtCellViewModel(
-                    name: char.name,
-                    status: char.status,
-                    img: URL(string: char.image))
+    public weak var delegate:RMEpisodeListtCellViewModelDelegate?
+    
+    var episodeData:[RMEpisode] = [] {
+        didSet {
+            for episode in episodeData {
+                let module = RMEpisodeViewCellViewModel(episodeUrl: URL(string: episode.url))
                 
-                if !charCellModule.contains(module){
-                    charCellModule.append(module)
+                if !episodeCellModule.contains(module){
+                    episodeCellModule.append(module)
                 }
             }
         }
@@ -28,21 +27,21 @@ class RMCharacterListViewViewModel: NSObject{
     
     
     
-    var charCellModule:[RMCharacterListtCellViewModel] = []
+    var episodeCellModule:[RMEpisodeViewCellViewModel] = []
     
     var apiInffo:RMInfo?
     
-    //function which gives us a data about characters from API
-    func FetchCharacters(){
+    //function which gives us a data about episodeacters from API
+    func FetchEpisode() {
         RMServise.shared.Execute(
-            RMServise.ListCharacterRequests.charachtersRequest ,
-            expecting: RMCharacterWindow.self) {[weak self] res in
+            RMServise.ListRequests.episodesRequest ,
+            expecting: RMEpisodeWindow.self) {[weak self] res in
                switch res{
                    case .success(let reses):
                         let results = reses.results
                         let info=reses.info
                        
-                        self?.CharData = results
+                        self?.episodeData = results
                         self?.apiInffo = info
                         self?.delegate?.DidLoad()
                         break
@@ -51,71 +50,65 @@ class RMCharacterListViewViewModel: NSObject{
                        break
                }
            }
-        isLoadingCharacters = false
+        isLoadingepisodeacters = false
     }
     
-    
-    
-    //MARK: Fetching from footer
-    
-    func FetchNewCharacters(){
-                guard !isLoadingCharacters else{
-                    return
-                }
-        isLoadingCharacters = true
-      
+    // MARK: Fetching from footer
+    func FetchNewEpisode() {
+        guard !isLoadingepisodeacters else{
+            return
+        }
+        isLoadingepisodeacters = true
+        
         guard let url = RMRequest(url: apiInffo?.next ?? "") else{
             fatalError("CaantGetURL")
         }
         
         print("IsFetching")
         RMServise.shared.Execute(url,
-                                 expecting: RMCharacterWindow.self) {[weak self] res in
+                                 expecting: RMEpisodeWindow.self) {[weak self] res in
             
             switch res{
-                case .success(let reses):
+            case .success(let reses):
                 let results = reses.results
                 let info=reses.info
-                    
                 
-             
+                
+                
                 self?.apiInffo = info
                 
-                let count = self?.CharData.count
+                let count = self?.episodeData.count
                 let new = results.count
                 let total = count!+new
                 let indexStart = total-new
-                print("pre-count: \(String(describing: self?.charCellModule.count))")
-                print("new: \(new)")
-                print("indexStart: \(indexStart)")
-                print(results.first?.name)
+ 
                 
                 let indexPathsToAdd:[IndexPath] = Array(indexStart..<(indexStart+new)).compactMap({
                     return IndexPath(row:$0, section: 0)
                 })
-                print("indexPathsToAdd: \(indexPathsToAdd)")
-                self?.CharData.append(contentsOf: results)
-                print("post-count: \(String(describing: self?.charCellModule.count))")
+//              print("indexPathsToAdd: \(indexPathsToAdd)")
+                self?.episodeData.append(contentsOf: results)
+//              print("post-count: \(String(describing: self?.episodeCellModule.count))")
                 DispatchQueue.main.async {
                     
-                    self?.delegate?.NewCharsDidLoad(with: indexPathsToAdd)
-                    self?.isLoadingCharacters=false
-                   
+                    self?.delegate?.NewepisodesDidLoad(with: indexPathsToAdd)
+                    self?.isLoadingepisodeacters=false
+                    
                 }
-               
+                
                 break
                 
                 
-                 case .failure(let Error):
-                    print(String(describing: Error))
-                    self?.isLoadingCharacters=false
-                    break
+            case .failure(let Error):
+                print(String(describing: Error))
+                self?.isLoadingepisodeacters=false
+                break
             }
             
         }
     }
-    public var MustShowScrollview:Bool {
-        
+    
+    public var MustShowScrollview: Bool {
         return (apiInffo?.next) != nil
     }
 }
@@ -123,52 +116,46 @@ class RMCharacterListViewViewModel: NSObject{
 
 
 //its for a grid in view (cells)
-extension RMCharacterListViewViewModel: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout{
+extension RMEpisodeListViewViewModel: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout{
     
     //functtion which detects how many object is in grid
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return charCellModule.count
+        return episodeCellModule.count
     }
     
     //function wchich takes an object to add to grid
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
         guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: RMCharackterListCellView.cellIdentifier,
-            for: indexPath) as? RMCharackterListCellView else {
+            withReuseIdentifier: RMEpisodeListCellView.Identifier,
+            for: indexPath) as? RMEpisodeListCellView else {
             return UICollectionViewCell()
         }
-                
-        cell.Configure(with: charCellModule[indexPath.row])
+
+        cell.Configure(viewMOdel: episodeCellModule[indexPath.row])
         return cell
     }
     
     //function which takes a size of each object
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = (UIScreen.main.bounds.width-30)/2
-        return CGSize(width: width, height: width*1.5)
+        let width = (UIScreen.main.bounds.width-30)
+        return CGSize(width: width, height: 150)
     }
+    
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
-        let char = CharData[indexPath.row]
-        delegate?.charTapped(character: char)
+        let episode = episodeData[indexPath.row]
+        delegate?.episodeTapped(episode: episode)
     }
-    
-  
-    
-
-   
 }
 
 //footer loading bar
-extension RMCharacterListViewViewModel{
-    
+extension RMEpisodeListViewViewModel {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         guard kind == UICollectionView.elementKindSectionFooter,  let footer = collectionView.dequeueReusableSupplementaryView(
             ofKind: UICollectionView.elementKindSectionFooter,
-            withReuseIdentifier: RMCharacterListViewCollectionReusableView.identifier,
-            for: indexPath) as? RMCharacterListViewCollectionReusableView else{
+            withReuseIdentifier: RMEpisodeListViewCollectionReusableView.identifier,
+            for: indexPath) as? RMEpisodeListViewCollectionReusableView else{
             return  UICollectionReusableView()
 
         }
@@ -189,10 +176,10 @@ extension RMCharacterListViewViewModel{
 
 
 
-extension RMCharacterListViewViewModel: UIScrollViewDelegate{
+extension RMEpisodeListViewViewModel: UIScrollViewDelegate{
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         guard MustShowScrollview,
-                !isLoadingCharacters
+                !isLoadingepisodeacters
         else{
             return
         }
@@ -206,7 +193,7 @@ extension RMCharacterListViewViewModel: UIScrollViewDelegate{
                
             if offset >= (totalSize - frameSize - 120){
                     //print("Bottom")
-                    self?.FetchNewCharacters()
+                    self?.FetchNewEpisode()
                 }
                 t.invalidate()
         }
