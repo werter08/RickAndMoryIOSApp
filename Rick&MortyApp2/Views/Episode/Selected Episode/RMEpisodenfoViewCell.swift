@@ -24,7 +24,7 @@ class RMEpisodeInfoViewCell: UICollectionViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.adjustsFontSizeToFitWidth = true
         label.minimumScaleFactor = 0.4
-        label.textColor = .black
+
         label.font = .systemFont(ofSize: 26, weight: .bold)
         label.textAlignment = .center
         return label
@@ -33,16 +33,31 @@ class RMEpisodeInfoViewCell: UICollectionViewCell {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .label
-        label.textAlignment = .center
+        label.textAlignment = .right
         label.adjustsFontSizeToFitWidth = true
+
         label.minimumScaleFactor = 0.4
+        label.setContentHuggingPriority(.required, for: .horizontal)
         label.font = .systemFont(ofSize: 22, weight: .heavy)
         return label
     }()
-    let titleView:UIView = {
-        let view = UIView()
+    let titleView:UIStackView = {
+        let view = UIStackView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        
+//        view.alignment = .center
+        view.distribution = .equalSpacing
+        view.spacing = 10
+        view.axis = .horizontal
+
+        view.layer.cornerRadius = 8
+        return view
+    }()
+    let titleViewWrapper:UIStackView = {
+        let view = UIStackView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.spacing = 0
+        view.axis = .vertical
+        view.alignment = .center
         view.backgroundColor = .blue
         view.layer.cornerRadius = 8
         return view
@@ -69,30 +84,27 @@ class RMEpisodeInfoViewCell: UICollectionViewCell {
     }
     
     private func SetUpConstrains(){
-        contentView.addSubs(titleView, valueLabel)
+        contentView.addSubs(titleViewWrapper, valueLabel)
         titleView.addSubs(iconImage, titleLabel)
         
         NSLayoutConstraint.activate([
             
-            titleView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-            titleView.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-            titleView.heightAnchor.constraint(equalTo: contentView.heightAnchor, multiplier: 0.40),
-            titleView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            titleViewWrapper.leftAnchor.constraint(equalTo: contentView.leftAnchor),
+            titleViewWrapper.rightAnchor.constraint(equalTo: contentView.rightAnchor),
+            titleViewWrapper.heightAnchor.constraint(equalTo: contentView.heightAnchor, multiplier: 0.40),
+            titleViewWrapper.topAnchor.constraint(equalTo: contentView.topAnchor),
             
-            iconImage.heightAnchor.constraint(equalToConstant: 25),
-            iconImage.widthAnchor.constraint(equalToConstant: 25),
+            iconImage.heightAnchor.constraint(equalToConstant: 24),
+            iconImage.widthAnchor.constraint(equalToConstant: 24),
             
-            titleLabel.leftAnchor.constraint(equalTo: titleView.leftAnchor, constant: 20),
-            titleLabel.topAnchor.constraint(equalTo: titleView.topAnchor, constant: 5),
-            titleLabel.rightAnchor.constraint(equalTo: titleView.rightAnchor, constant: -40),
-            titleLabel.bottomAnchor.constraint(equalTo: titleView.bottomAnchor, constant: -5),
+
             
-            iconImage.leftAnchor.constraint(equalTo: titleLabel.rightAnchor, constant: 5),
-            iconImage.topAnchor.constraint(equalTo: titleView.topAnchor, constant: 10),
-            iconImage.bottomAnchor.constraint(equalTo: titleView.bottomAnchor, constant: -10),
+//            iconImage.leftAnchor.constraint(equalTo: titleLabel.rightAnchor, constant: 5),
+//        //    iconImage.topAnchor.constraint(equalTo: titleView.topAnchor, constant: 10),
+//            iconImage.bottomAnchor.constraint(equalTo: titleView.bottomAnchor, constant: -10),
             
             valueLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10),
-            valueLabel.topAnchor.constraint(equalTo: titleView.bottomAnchor),
+            valueLabel.topAnchor.constraint(equalTo: titleViewWrapper.bottomAnchor),
             valueLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10),
             valueLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
         ])
@@ -112,5 +124,10 @@ class RMEpisodeInfoViewCell: UICollectionViewCell {
         titleLabel.textColor = viewMOdel.toShowColor
         iconImage.tintColor = viewMOdel.toShowColor
         valueLabel.text = viewMOdel.toShowValue
+        iconImage.image = viewMOdel.toShowIcon
+        
+        titleViewWrapper.addArrangedSubview(titleView)
+        titleView.addArrangedSubview(titleLabel)
+        titleView.addArrangedSubview(iconImage)
     }
 }

@@ -78,6 +78,7 @@ final class RMServise{
     public struct ListRequests{
         static let charachtersRequest = RMRequest.init(endPoint: .character)
         static let episodesRequest = RMRequest.init(endPoint: .episode)
+        static let locationsRequest = RMRequest.init(endPoint: .location)
     }
 }
 

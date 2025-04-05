@@ -18,7 +18,7 @@ class RMTapBarController: UITabBarController {
         let charVC = RMCharactersVC()
         let locVC = RMLocationsVC()
         let episodeVC = RMEpisodesVC()
-        let settingsVC = RMSettincVC()
+        let settingsVC = RMSettingsVC()
         
         charVC.navigationItem.largeTitleDisplayMode = .automatic
         locVC.navigationItem.largeTitleDisplayMode = .automatic

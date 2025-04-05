@@ -4,7 +4,7 @@ import UIKit
 
 class RMEpisodesVC: UIViewController,RMEpisodeListViewDelegate {
     func episodeTapped(_ charListView: RMEpisodeListView, episode: RMEpisode) {
-       print("MOve")
+        print("MOve")
         let vc=RMEpisodesSelectedViewController(url: URL(string: episode.url))
         vc.navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(vc, animated: true)

@@ -7,12 +7,24 @@
 
 import UIKit
 
-final class RMEpisodeInfoViewCellViewModel {
+final class RMLocationInfoViewCellViewModel {
     
     private let type: `Type`
     private let value:String
     
- 
+    private var ShortDate:String {
+        let isoF = ISO8601DateFormatter()
+        isoF.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        
+        if let date = isoF.date(from: value) {
+            let dateF = DateFormatter()
+            dateF.dateFormat = "dd.MM.yyyy"
+            dateF.timeZone = TimeZone.current
+            
+            return dateF.string(from: date)
+        }
+        return "Years Ago"
+    }
     
     public var toShowTitle:String{
         
@@ -22,6 +34,9 @@ final class RMEpisodeInfoViewCellViewModel {
     
         if value.isEmpty{
             return "None"
+        }
+        if type.GetToShowTitle == "CREATED"{
+            return ShortDate
         }
         return value
     }
@@ -36,20 +51,20 @@ final class RMEpisodeInfoViewCellViewModel {
     }
     
     enum `Type`:String{
-        case air_date
+        case created
         case name
         case episode
         case totalCharacter
         
         var GetToShowTitle:String {
             switch self{
-            case .air_date,.name,.episode: return rawValue.uppercased()
+            case .created,.name,.episode: return rawValue.uppercased()
             case .totalCharacter: return "TOTAL CHARACTERS"
             }
         }
         var GetToShowImage:UIImage?{
             switch self{
-            case .air_date:
+            case .created:
                 return UIImage(systemName: "bell")
             case .episode:
                 return UIImage(systemName: "bell")
@@ -61,7 +76,7 @@ final class RMEpisodeInfoViewCellViewModel {
         }
         var GetToShowColor:UIColor {
             switch self{
-            case .air_date:
+            case .created:
                 return UIColor.systemRed
             case .episode:
                 return UIColor.systemMint

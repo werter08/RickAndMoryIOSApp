@@ -19,5 +19,10 @@
 			</array>
 		</dict>
 	</dict>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UILaunchScreen</key>
+		<string>LaunchScreen</string>
+	</dict>
 </dict>
 </plist>
