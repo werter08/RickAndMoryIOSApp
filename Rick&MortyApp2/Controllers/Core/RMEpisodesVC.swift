@@ -28,7 +28,9 @@ class RMEpisodesVC: UIViewController,RMEpisodeListViewDelegate {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(tapButtonTapped))
     }
     @objc private func tapButtonTapped(){
-        
+        let vc=RMSearchViewController(config: .init(type: .episode))
+        vc.navigationItem.largeTitleDisplayMode = .never
+        navigationController?.pushViewController(vc, animated: true)
     }
 
 

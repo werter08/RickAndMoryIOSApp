@@ -34,7 +34,9 @@ class RMLocationsVC: UIViewController, RMLocationListViewModelDelegate, RMLocati
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(tapButtonTapped))
     }
     @objc private func tapButtonTapped(){
-        
+        let vc=RMSearchViewController(config: .init(type: .location))
+        vc.navigationItem.largeTitleDisplayMode = .never
+        navigationController?.pushViewController(vc, animated: true)
     }
     private func setUPConstraionts(){
         view.addSubview(contentView)

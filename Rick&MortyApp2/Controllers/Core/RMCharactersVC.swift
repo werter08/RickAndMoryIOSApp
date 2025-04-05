@@ -25,7 +25,9 @@ class RMCharactersVC: UIViewController,RMCharackterListViewDelegate {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(tapButtonTapped))
     }
     @objc private func tapButtonTapped(){
-        
+        let vc=RMSearchViewController(config: .init(type: .character))
+        vc.navigationItem.largeTitleDisplayMode = .never
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     private func SetUpConstraint(){

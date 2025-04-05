@@ -53,24 +53,24 @@ final class RMLocationInfoViewCellViewModel {
     enum `Type`:String{
         case created
         case name
-        case episode
-        case totalCharacter
+        case type
+        case dimension
         
         var GetToShowTitle:String {
             switch self{
-            case .created,.name,.episode: return rawValue.uppercased()
-            case .totalCharacter: return "TOTAL CHARACTERS"
+            case .created,.name,.type: return rawValue.uppercased()
+            case .dimension: return "TOTAL CHARACTERS"
             }
         }
         var GetToShowImage:UIImage?{
             switch self{
             case .created:
                 return UIImage(systemName: "bell")
-            case .episode:
+            case .type:
                 return UIImage(systemName: "bell")
             case .name:
                 return UIImage(systemName: "bell")
-            case .totalCharacter:
+            case .dimension:
                 return UIImage(systemName: "bell")
             }
         }
@@ -78,11 +78,11 @@ final class RMLocationInfoViewCellViewModel {
             switch self{
             case .created:
                 return UIColor.systemRed
-            case .episode:
+            case .type:
                 return UIColor.systemMint
             case .name:
                 return UIColor.systemPink
-            case .totalCharacter:
+            case .dimension:
                 return UIColor.systemGreen
             }
         }

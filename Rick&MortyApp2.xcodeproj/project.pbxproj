@@ -11,7 +11,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		66DA73F22D9622E3005BC298 /* Exceptions for "Rick&MortyApp2" folder in "Rick&MortyApp2" target */ = {
+		669EF8DB2DA174B700A5F622 /* Exceptions for "Rick&MortyApp2" folder in "Rick&MortyApp2" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -24,7 +24,7 @@
 		66DA73E22D9622E3005BC298 /* Rick&MortyApp2 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				66DA73F22D9622E3005BC298 /* Exceptions for "Rick&MortyApp2" folder in "Rick&MortyApp2" target */,
+				669EF8DB2DA174B700A5F622 /* Exceptions for "Rick&MortyApp2" folder in "Rick&MortyApp2" target */,
 			);
 			path = "Rick&MortyApp2";
 			sourceTree = "<group>";

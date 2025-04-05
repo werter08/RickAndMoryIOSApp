@@ -7,14 +7,13 @@
 
 import UIKit
 
-protocol RMLocationViewCellViewModelDelegate {
+protocol RMLocationCellViewModelDelegate {
     func didFetchDate()
 }
 
 class RMLoactionSelectedViewViewModel {
 
-    let url: URL?
-    private var location:RMLocation?
+    private var location:RMLocation
     
   
     public var sections: [sectionTypes] = []
@@ -22,7 +21,7 @@ class RMLoactionSelectedViewViewModel {
 
     
     
-    public var delegate: RMLocationViewCellViewModelDelegate?
+    public var delegate: RMLocationCellViewModelDelegate?
     private var dateChars: (RMLocation, [RMCharacter])?{
         didSet{
             delegate?.didFetchDate()
@@ -31,34 +30,19 @@ class RMLoactionSelectedViewViewModel {
     
     
     
-    init(url: URL?) {
-        self.url = url
+    init(model: RMLocation) {
+        self.location = model
         
     }
     
     
     public func fetchDate(){
-        guard let url, let request = RMRequest.init(url: url.absoluteString) else{
-            return
-        }
-        
-        RMServise.shared.Execute(
-            request,
-            expecting: RMLocation.self) { Result in
-            switch Result {
-            case .success(let success):
-                print(String(describing: success))
-                self.location = success
-                self.fetchChars(model: success)
-            case .failure(let failure):
-                print(String(describing: failure))
-            }
-        }
-        
+       
+        self.fetchChars(model: self.location)
     }
     
     private func fetchChars(model: RMLocation){
-        let requests:[RMRequest] = (model.characters.compactMap({
+        let requests:[RMRequest] = (model.residents.compactMap({
             return RMRequest.init(url: $0)
         }))
         
@@ -102,15 +86,13 @@ extension RMLoactionSelectedViewViewModel {
 
     
     func SetUpSection(){
-        guard let location else{
-            return
-        }
         let chs = dateChars?.1
         sections = [
             .infoSection(viewModels: [
                 .init(type: .name, value: location.name),
-                .init(type: .type, value: location.location),
-                .init(type: .dimension, value: location.air_date),
+                .init(type: .type, value: location.type),
+                .init(type: .dimension, value: location.dimension),
+                .init(type: .created, value: location.created),
             ]),
             .chars(viewModels: (chs?.compactMap({
                 return RMCharacterListtCellViewModel(name: $0.name, status: $0.status, img: URL(string: $0.image))

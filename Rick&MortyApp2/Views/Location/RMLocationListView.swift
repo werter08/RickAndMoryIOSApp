@@ -42,6 +42,7 @@ class RMLocationListView: UIView {
         table.alpha = 0
         table.isHidden = true
         table.register(RMLocationCellView.self, forCellReuseIdentifier: RMLocationCellView.identifier)
+//        table.register(RMLocationListViewCollectionReusableView.self, forCellReuseIdentifier: RMLocationListViewCollectionReusableView.identifier)
         return table
     }()
     
