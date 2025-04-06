@@ -46,6 +46,7 @@ class RMCharacterListtCellViewModel: Hashable{
             completion(.failure(URLError(.badURL)))
             return
         }
+
         RMImageManager.shared.DownloadImage(url: url, completion: completion)
         
         

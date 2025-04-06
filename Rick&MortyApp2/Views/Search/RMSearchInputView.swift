@@ -67,7 +67,7 @@ class RMSearchInputView: UIView {
         super.init(frame: .zero)
         translatesAutoresizingMaskIntoConstraints = false
         addSubview(verticalStack)
-        setNoSerachConstraint()
+        setSerachConstraint()
         searchInputView.delegate = self
     }
     required init?(coder: NSCoder) {
@@ -77,12 +77,12 @@ class RMSearchInputView: UIView {
     
     //MARK: - Constraints
     
-    func setNoSerachConstraint(){
+    func setSerachConstraint(){
         NSLayoutConstraint.activate([
             verticalStack.topAnchor.constraint(equalTo: topAnchor),
             verticalStack.leftAnchor.constraint(equalTo: leftAnchor, constant: 10),
             verticalStack.rightAnchor.constraint(equalTo: rightAnchor, constant: -10),
-            horizontalStack.heightAnchor.constraint(equalToConstant: 50)
+            verticalStack.bottomAnchor.constraint(equalTo: bottomAnchor),
             
         ])
     }
@@ -109,7 +109,10 @@ class RMSearchInputView: UIView {
             
         }
 
-        verticalStack.addArrangedSubview(horizontalStack)
+        if !horizontalStack.arrangedSubviews.isEmpty {
+            verticalStack.addArrangedSubview(horizontalStack)
+        }
+
     }
     
     

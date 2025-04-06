@@ -13,9 +13,13 @@ final class RMSearchViewModel {
     private var optionMap: [RMSearchInputViewModel.options : String] = [:]
     private var searchText: String = ""
     private var OptionChangeBlock: ((RMSearchInputViewModel.options, String) -> Void)?
-    private var registerSearchResult: ((RMSearchResultsViewModele?) -> Void)?
+    private var registerSearchResult: ((RMSearchResultsViewModel?) -> Void)?
  
-    public var searchResultModels: Codable?
+
+    
+    public var locations: [RMLocation] = []
+    public var characters: [RMCharacter] = []
+    public var episodes: [RMEpisode] = []
 // MARK: - INIT
     
     init(config: RMSearchViewController.Config) {
@@ -35,7 +39,7 @@ final class RMSearchViewModel {
     func registerOptionChangeBlock(_ block: @escaping(RMSearchInputViewModel.options, String) -> Void){
         self.OptionChangeBlock = block
     }
-    func registerSerchResultHandler(_ block:@escaping(RMSearchResultsViewModele?) -> Void){
+    func registerSerchResultHandler(_ block:@escaping(RMSearchResultsViewModel?) -> Void){
         self.registerSearchResult = block
     }
     
@@ -66,7 +70,19 @@ final class RMSearchViewModel {
         RMServise.shared.Execute(request, expecting: tupe) { [weak self] res in
             switch res {
             case .success(let model):
-                self?.searchResultModels = model
+
+                
+                if let model = model as? RMCLocationWindow {
+                    self?.locations.append(contentsOf: model.results)
+                }
+                if let model = model as? RMCharacterWindow {
+                    self?.characters.append(contentsOf: model.results)
+                }
+                if let model = model as? RMEpisodeWindow {
+                    self?.episodes.append(contentsOf: model.results)
+                }
+                
+                
                 self?.proccesSerachResults(model: model)
             case .failure(let failure):
                 print(String(describing: failure))
@@ -75,23 +91,31 @@ final class RMSearchViewModel {
         }
     }
     private func proccesSerachResults(model: Codable){
-        var results: RMSearchResultsViewModele?
-        
+        var results: RMSearchResultsType?
+        var nextUrl: String?
         if let characterResults = model as? RMCharacterWindow {
             results = .characters(characterResults.results.compactMap({
                 return RMCharacterListtCellViewModel(name: $0.name, status: $0.status, img: URL(string: $0.image))
-            }))
-        } else if let locationResults = model as? RMCLocationWindow {
+                })
+            )
+            nextUrl = characterResults.info.next
+        }
+        else if let locationResults = model as? RMCLocationWindow {
             results = .locations(locationResults.results.compactMap({
                 return RMLocationCellViewModel(location: $0)
-            }))
-        } else if let episodeResults = model as? RMEpisodeWindow {
+                })
+            )
+            nextUrl = locationResults.info.next
+        }
+        else if let episodeResults = model as? RMEpisodeWindow {
             results = .episodes(episodeResults.results.compactMap({
                 return RMEpisodeViewCellViewModel(episodeUrl: URL(string: $0.url))
-            }))
+                })
+            )
+            nextUrl = episodeResults.info.next
         }
         if let cells = results{
-            self.registerSearchResult?(cells)
+            self.registerSearchResult?(RMSearchResultsViewModel(results: results, next: nextUrl))
            
         } else {
             noResults()
@@ -106,25 +130,19 @@ final class RMSearchViewModel {
     }
     
     func getLocationModel(at index: Int) -> RMLocation? {
-        guard let locations = searchResultModels as? RMCLocationWindow else {
-            return nil
-        }
-        return locations.results[index]
+        
+        return locations[index]
     }
     
     func getCharacterModel(at index: Int) -> RMCharacter? {
-        guard let characters = searchResultModels as? RMCharacterWindow else {
-            return nil
-        }
-        return characters.results[index]
+        
+        return characters[index]
         
     }
     
     func getEpisodeModel(at index: Int) -> RMEpisode? {
-        guard let episodes = searchResultModels as? RMEpisodeWindow else {
-            return nil
-        }
-        return episodes.results[index]
+        
+        return episodes[index]
     }
     
 }

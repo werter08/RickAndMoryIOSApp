@@ -139,7 +139,9 @@ extension RMCharacterListViewViewModel: UICollectionViewDelegate, UICollectionVi
     
     //function which takes a size of each object
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = (UIScreen.main.bounds.width-30)/2
+        let isIpfone = UIDevice.current.userInterfaceIdiom == .phone
+        let width =  isIpfone ? (UIScreen.main.bounds.width-30)/2 : (UIScreen.main.bounds.width-30)/4
+        
         return CGSize(width: width, height: width*1.5)
     }
     

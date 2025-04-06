@@ -18,6 +18,7 @@ class RMImageManager{
 
         if let data = self.cashe.object(forKey: key) {
             completion(.success(data as Data))
+            print("True")
             return
         }
         let urlRequest = URLRequest(url: url)

@@ -94,12 +94,12 @@ class RMSearchView: UIView, RMSearchInputViewDelegate, RMSearchResultViewDelegat
             SearchInputView.topAnchor.constraint(equalTo: topAnchor),
             SearchInputView.leftAnchor.constraint(equalTo: leftAnchor),
             SearchInputView.rightAnchor.constraint(equalTo: rightAnchor),
-            SearchInputView.heightAnchor.constraint(equalToConstant: 150)
+            //SearchInputView.heightAnchor.constraint(equalToConstant: 150)
         ])
     }
     func setSearchResultConstraint(){
         NSLayoutConstraint.activate([
-            SearchResultView.topAnchor.constraint(equalTo: SearchInputView.bottomAnchor),
+            SearchResultView.topAnchor.constraint(equalTo: SearchInputView.bottomAnchor, constant: 10),
             SearchResultView.leftAnchor.constraint(equalTo: leftAnchor),
             SearchResultView.rightAnchor.constraint(equalTo: rightAnchor),
             SearchResultView.bottomAnchor.constraint(equalTo: bottomAnchor),
@@ -124,8 +124,9 @@ class RMSearchView: UIView, RMSearchInputViewDelegate, RMSearchResultViewDelegat
     func TextChanged(_ view: RMSearchInputView, text: String) {
         ViewModel.setSearchText(text: text)
     }
+
     func getTappedLocationCell(_ view: RMSearchResultView, at index: Int) {
-        let locationModel = ViewModel.getLocationModel(at: index)
+        let locationModel = ViewModel       .getLocationModel(at: index)
         if let locationModel {
             delegate?.didTappedLocationCell(self, model: locationModel)
         }
@@ -141,6 +142,18 @@ class RMSearchView: UIView, RMSearchInputViewDelegate, RMSearchResultViewDelegat
         if let charModel {
             delegate?.didTappedCharacterCell(self, model: charModel)
         }
+    }
+
+    func updateCharackters(_ view: RMSearchResultView, newCharacters: [RMCharacter]) {
+        ViewModel.characters.append(contentsOf: newCharacters)
+    }
+    
+    func updateEpisodes(_ view: RMSearchResultView, newCharacters: [RMEpisode]) {
+        ViewModel.episodes.append(contentsOf: newCharacters)
+    }
+    
+    func updateLocations(_ view: RMSearchResultView, newCharacters: [RMLocation]) {
+        ViewModel.locations.append(contentsOf: newCharacters)
     }
 }
 

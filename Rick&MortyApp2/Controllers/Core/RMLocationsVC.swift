@@ -52,4 +52,12 @@ class RMLocationsVC: UIViewController, RMLocationListViewModelDelegate, RMLocati
     func didFetch() {
         contentView.configure(viewModel: self.viewModel)
     }
+    
+    
+    func NewLocationsDidLoad(with indexPath: [IndexPath]) {
+        print(indexPath.count)
+        contentView.didFinishPagination()
+    }
+        
+    
 }

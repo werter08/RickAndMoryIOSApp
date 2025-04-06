@@ -25,7 +25,9 @@ final class RMLocationCellViewModel: Equatable {
         return location.dimension
     }
     
-    
+    public var model: RMLocation {
+        return location
+    }
     
     static func == (lhs: RMLocationCellViewModel, rhs: RMLocationCellViewModel) -> Bool {
         lhs.location.id == rhs.location.id

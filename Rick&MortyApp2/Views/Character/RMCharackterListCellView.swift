@@ -45,6 +45,9 @@ class RMCharackterListCellView: UICollectionViewCell {
         SetUpLayer()
         
     }
+    
+    
+    
     required init?(coder: NSCoder) {
         fatalError("Unspeckted")
     }
@@ -89,20 +92,30 @@ class RMCharackterListCellView: UICollectionViewCell {
     public func Configure(with module: RMCharacterListtCellViewModel){
         nameLabel.text = module.name
         statusLabel.text = module.StatusText()
-        module.FetchImage{res in
-            switch res {
-            case .success(let data):
-                DispatchQueue.main.async {
-                    let image = UIImage(data: data)
-                    self.image.image = image
+        image.image = nil
+        
+        DispatchQueue.main.async {
+            module.FetchImage{res in
+                switch res {
+                case .success(let data):
+                    DispatchQueue.main.async {
+                        
+                        let image = UIImage(data: data)
+                        self.image.image = image
+                    }
+                case .failure(let failure):
+                    print(String(describing: failure))
+                    print("FAIL TO SET IMAGE")
                 }
-            case .failure(let failure):
-                print(String(describing: failure))
             }
         }
+        
         
     }
     override func prepareForReuse() {
         super.prepareForReuse()
+        nameLabel.text = nil
+        statusLabel.text = nil
+        image.image = nil
     }
 }

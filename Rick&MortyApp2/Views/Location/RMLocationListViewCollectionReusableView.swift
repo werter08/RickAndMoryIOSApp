@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class RMLocationListViewCollectionReusableView: UICollectionReusableView {
+final class RMLocationListViewCollectionReusableView: UIView {
     
     
     static let identifier = "RMLocationListViewCollectionReusableView"
@@ -39,7 +39,10 @@ final class RMLocationListViewCollectionReusableView: UICollectionReusableView {
             spiner.widthAnchor.constraint(equalToConstant: 100),
             spiner.heightAnchor.constraint(equalToConstant: 100),
             spiner.centerXAnchor.constraint(equalTo: centerXAnchor),
-            spiner.centerYAnchor.constraint(equalTo: centerYAnchor)
+            spiner.centerYAnchor.constraint(equalTo: centerYAnchor),
+            
+            self.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width),
+            self.heightAnchor.constraint(equalToConstant: 100)
         ])
     }
     public func StartSpin(){

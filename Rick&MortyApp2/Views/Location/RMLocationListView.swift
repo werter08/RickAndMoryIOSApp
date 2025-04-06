@@ -52,6 +52,7 @@ class RMLocationListView: UIView {
 
 
         translatesAutoresizingMaskIntoConstraints = false
+
         addSubs(spiner, tableVie)
         setUpconstraints()
         tableVie.delegate = self
@@ -81,6 +82,7 @@ class RMLocationListView: UIView {
     
     public func configure(viewModel: RMLocationListViewModel){
         self.viewModel = viewModel
+   
     }
 }
 
@@ -113,4 +115,59 @@ extension RMLocationListView: UITableViewDataSource {
     }
     
     
+    
+}
+extension RMLocationListView: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard let viewModel = self.viewModel,
+                viewModel.MustShowScrollview,
+              !viewModel.isLoadingCharacters
+        else{
+            return
+        }
+
+        Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false) {
+            [weak self] t in
+            let offset = scrollView.contentOffset.y
+            let frameSize = scrollView.frame.size.height
+            let totalSize = scrollView.contentSize.height
+            
+            if !viewModel.MustShowScrollview {
+                self?.tableVie.tableFooterView = nil
+                return
+            }
+            
+            if offset >= (totalSize - frameSize - 120){
+                
+                DispatchQueue.main.async {
+                    self?.setFooter()
+                }
+                
+                self?.viewModel?.fetchNewLocations()
+            }
+                
+
+            t.invalidate()
+            
+        }
+        
+   
+        
+    }
+    
+    func setFooter(){
+        let footer = RMLocationListViewCollectionReusableView()
+        footer.frame = CGRect(x: 0, y: 0, width: frame.size.width, height: 100)
+        footer.StartSpin()
+        tableVie.tableFooterView = footer
+    }
+    
+    func didFinishPagination() {
+        DispatchQueue.main.async {
+            self.tableVie.reloadData()
+            self.viewModel!.isLoadingCharacters = false
+         
+        }
+
+    }
 }

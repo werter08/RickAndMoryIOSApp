@@ -10,6 +10,9 @@ protocol RMSearchResultViewDelegate: AnyObject {
     func getTappedLocationCell(_ view: RMSearchResultView,at index: Int)
     func getTappedCharacterCell(_ view: RMSearchResultView,at index: Int)
     func getTappedEpisodeCell(_ view: RMSearchResultView,at index: Int)
+    func updateCharackters(_ view: RMSearchResultView, newCharacters: [RMCharacter])
+    func updateEpisodes(_ view: RMSearchResultView, newCharacters: [RMEpisode])
+    func updateLocations(_ view: RMSearchResultView, newCharacters: [RMLocation])
 }
 
 
@@ -17,7 +20,7 @@ class RMSearchResultView: UIView, UITableViewDelegate {
 
     weak var delegate: RMSearchResultViewDelegate?
     
-    private var viewModel: RMSearchResultsViewModele? {
+    private var viewModel: RMSearchResultsViewModel? {
         didSet {
             DispatchQueue.main.async {
                 self.setCells()
@@ -49,7 +52,7 @@ class RMSearchResultView: UIView, UITableViewDelegate {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints=false;
         collectionView.isHidden=true
- 
+        
 
         //givind a identificator for cells in thic grid
         collectionView.register(RMCharackterListCellView.self,
@@ -102,26 +105,28 @@ class RMSearchResultView: UIView, UITableViewDelegate {
     
     
     //MARK: - Configure
-    func configure(viewModel: RMSearchResultsViewModele){
+    func configure(viewModel: RMSearchResultsViewModel){
         self.viewModel = viewModel
 
     }
+    
     
     //MARK: - SET UP UI
     func setCells() {
         guard let viewModel  else {
             fatalError()
         }
-        switch viewModel {
+        switch viewModel.results {
         case.characters(let cells):
             setUpCollectionView(cells: cells)
             break
         case.episodes(let cells):
             setUpCollectionView(cells: cells)
-      
             break
         case.locations(let cells):
             setUpTableView(cells: cells)
+            break
+        case .none:
             break
         }
     }
@@ -169,12 +174,19 @@ extension RMSearchResultView: UITextViewDelegate, UITableViewDataSource {
     
 }
 
+
+
+
+
+
+
 //MARK: - COLLECCTION VIEW
 extension RMSearchResultView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return collectionCellViewModels.count
     }
     
+    //MARK: - collection view cell creater
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let currentModel = collectionCellViewModels[indexPath.row]
         
@@ -184,7 +196,11 @@ extension RMSearchResultView: UICollectionViewDelegate, UICollectionViewDataSour
                 for: indexPath) as? RMCharackterListCellView else {
                 fatalError()
             }
-            cell.Configure(with: charVM)
+            DispatchQueue.main.async {
+                cell.Configure(with: charVM)
+            }
+
+            
             return cell
         }
         
@@ -202,16 +218,21 @@ extension RMSearchResultView: UICollectionViewDelegate, UICollectionViewDataSour
         
         fatalError()
     }
+    
+    //MARK: - collection view tapped delegate
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
         let currentModel = collectionCellViewModels[indexPath.row]
         if currentModel is RMCharacterListtCellViewModel {
             delegate?.getTappedCharacterCell(self, at: indexPath.row)
+            return
         }
         delegate?.getTappedEpisodeCell(self, at: indexPath.row)
         
         
     }
+    
+    //MARK: - collection view size
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,
         sizeForItemAt indexPath: IndexPath) -> CGSize {
         let currentModel = collectionCellViewModels[indexPath.row]
@@ -221,5 +242,181 @@ extension RMSearchResultView: UICollectionViewDelegate, UICollectionViewDataSour
         }
         let width = (UIScreen.main.bounds.width-30)
         return CGSize(width: width, height: 150)
+    }
+}
+
+
+//MARK: - collection view footer
+extension RMSearchResultView {
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        guard kind == UICollectionView.elementKindSectionFooter,  let footer = collectionView.dequeueReusableSupplementaryView(
+            ofKind: UICollectionView.elementKindSectionFooter,
+            withReuseIdentifier: RMCharacterListViewCollectionReusableView.identifier,
+            for: indexPath) as? RMCharacterListViewCollectionReusableView else{
+            return  UICollectionReusableView()
+
+        }
+        footer.StartSpin()
+        return footer
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
+        guard ((self.viewModel?.MustShowScrollview) != nil), self.viewModel?.next != nil else{
+            return .zero
+        }
+        
+        return CGSize(width: UIScreen.main.bounds.width, height: 100)
+    }
+}
+
+
+//MARK: -  footer
+extension RMSearchResultView: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        
+        handleScrollForTable(scrollView)
+      
+        handleScrollForCollection(scrollView)
+
+    }
+    
+    func setFooter(){
+        let footer = RMLocationListViewCollectionReusableView()
+        footer.frame = CGRect(x: 0, y: 0, width: frame.size.width, height: 100)
+        footer.StartSpin()
+        tableView.tableFooterView = footer
+    }
+    
+    func didFinishPagination() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+ //           self.collectionView.reloadData()
+            self.viewModel!.isLoadingDate = false
+            
+        }
+
+    }
+    
+    //MARK: - SCROLL VIEW FOR TABLE VIEW
+    private func handleScrollForTable(_ scrollView: UIScrollView){
+        guard let viewModel = self.viewModel,
+              !locationCellViewModels.isEmpty,
+                viewModel.MustShowScrollview,
+              !viewModel.isLoadingDate
+        else{
+            return
+        }
+
+        Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false) {
+            [weak self] t in
+            let offset = scrollView.contentOffset.y
+            let frameSize = scrollView.frame.size.height
+            let totalSize = scrollView.contentSize.height
+            
+            if !viewModel.MustShowScrollview {
+                self?.tableView.tableFooterView = nil
+                return
+            }
+            
+            if offset >= (totalSize - frameSize - 120){
+                
+                DispatchQueue.main.async {
+                    self?.setFooter()
+                }
+
+                self?.viewModel?.fetchNewLocations { results, models in
+                    self?.locationCellViewModels = results
+                    self?.didFinishPagination()
+                    self?.delegate?.updateLocations(self!, newCharacters: models)
+                }
+            }
+            t.invalidate()
+            
+        }
+        
+    }
+    
+    //MARK: - Scroll view for Collection view
+    private func handleScrollForCollection(_ scrollView: UIScrollView){
+        guard let viewModel = self.viewModel,
+              !collectionCellViewModels.isEmpty,
+                viewModel.MustShowScrollview,
+              !viewModel.isLoadingDate
+        else{
+            return
+        }
+
+        Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false) {
+            [weak self] t in
+            let offset = scrollView.contentOffset.y
+            let frameSize = scrollView.frame.size.height
+            let totalSize = scrollView.contentSize.height
+            
+            if !viewModel.MustShowScrollview {
+                return
+            }
+            
+            if offset >= (totalSize - frameSize - 120){
+                
+                let cellViewModel = self?.collectionCellViewModels[0]
+                
+                if cellViewModel is RMCharacterListtCellViewModel {
+                    
+                    self?.viewModel?.fetchNewChracters(complation: { results, models in
+                        self?.didFinishPagination()
+                        let count = self?.collectionCellViewModels.count
+                        self?.collectionCellViewModels = results
+                        let new = results.count - count!
+                        
+                        let indexStart = (self?.collectionCellViewModels.count)! - new
+                        let indexPathsToAdd:[IndexPath] = Array(indexStart..<(indexStart+new)).compactMap({
+                            return IndexPath(row:$0, section: 0)
+                        })
+                        DispatchQueue.main.async {
+                            self!.collectionView.performBatchUpdates {
+                                self!.collectionView.insertItems(at: indexPathsToAdd)
+                            }
+                        }
+                       
+                        self?.delegate?.updateCharackters(self!, newCharacters: models)
+                        
+                    })
+                } else {
+                    self?.viewModel?.fetchNewEpisodes(complation: { results, models in
+
+                        self?.didFinishPagination()
+                        
+                        let count = self?.collectionCellViewModels.count
+                        self?.collectionCellViewModels = results
+                        let new = results.count - count!
+                        
+                        let indexStart = (self?.collectionCellViewModels.count)! - new
+                      
+                        let indexPathsToAdd:[IndexPath] = Array(indexStart..<(indexStart+new)).compactMap({
+                            return IndexPath(row:$0, section: 0)
+                        })
+                        
+                        
+                        DispatchQueue.main.async {
+                            self!.collectionView.performBatchUpdates {
+                                self!.collectionView.insertItems(at: indexPathsToAdd)
+                            }
+                        }
+                        
+                        self?.delegate?.updateEpisodes(self!, newCharacters: models)
+                    })
+                }
+                
+               
+               
+                
+            }
+                
+
+            t.invalidate()
+            
+        }
+        
+        
     }
 }
