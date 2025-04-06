@@ -25,6 +25,8 @@ final class RMEpisodeViewCellViewModel {
     init(episodeUrl:URL?){
         self.episodeUrl = episodeUrl
     }
+  
+    
     private var dataBlock: ((RMEpisodeInChar) -> Void)?
     
     public func RegisterForDate(_ block: @escaping (RMEpisodeInChar) -> Void){

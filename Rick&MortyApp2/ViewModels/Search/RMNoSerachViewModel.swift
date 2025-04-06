@@ -5,8 +5,9 @@
 //  Created by Shirin-Yan on 05.04.2025.
 //
 
-import Foundation
+import UIKit
 
 final class RMNoSearchViewModel {
-    
+    let label = "No results"
+    let icon = UIImage(systemName: "exclamationmark.magnifyingglass")
 }

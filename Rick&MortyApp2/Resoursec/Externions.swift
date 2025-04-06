@@ -13,6 +13,22 @@ extension UIView{
     }
 }
 
+extension UIStackView{
+    func addArrangedSubViews(_ view:UIView...){
+        view.forEach({
+            addArrangedSubview($0)
+        })
+    }
+    func constraintsToView(stack: UIStackView, view: UIView){
+        NSLayoutConstraint.activate([
+            stack.topAnchor.constraint(equalTo: view.topAnchor),
+            stack.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            stack.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            stack.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+    }
+}
+
 extension UILabel {
     func addTrailing(image: UIImage) {
         let attachment = NSTextAttachment()
